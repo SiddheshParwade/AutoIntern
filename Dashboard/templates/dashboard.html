@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - AutoIntern</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fc;
+      padding: 40px;
+      color: #333;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 800px;
+      margin: 0 auto 20px;
+    }
+    .logout-form {
+      margin: 0;
+    }
+    .logout-form button {
+      padding: 8px 16px;
+      background: #ff4b5c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .logout-form button:hover {
+      background: #e60027;
+    }
+    h1 {
+      text-align: center;
+      color: #4a63e7;
+    }
+    form {
+      max-width: 800px;
+      margin: 30px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin: 10px 0 5px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+    }
+    button[type="submit"] {
+      padding: 12px 20px;
+      background: #4a63e7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover {
+      background: #3247cc;
+    }
+    .results {
+      max-width: 800px;
+      margin: 20px auto;
+      background: #e8f0fe;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .result-item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .result-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <h1>Internship Search Dashboard</h1>
+    <form method="post" action="{% url 'logout' %}" class="logout-form">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <label for="urls">Enter Internship URLs (one per line):</label>
+    <textarea id="urls" name="urls" rows="5" placeholder="https://internshala.com/internship1\nhttps://example.com/job2"></textarea>
+
+    <label for="keywords">Enter Keywords to Search (comma-separated):</label>
+    <input type="text" id="keywords" name="keywords" placeholder="django, data science, remote">
+
+    <button type="submit">Search Internships</button>
+  </form>
+
+  {% if results %}
+  <div class="results">
+    <h2>Matched Internships:</h2>
+    {% for r in results %}
+      <div class="result-item">
+        <strong>{{ r.url }}</strong><br>
+        Matched Keywords: {{ r.matches|join:", " }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</body>
+</html>

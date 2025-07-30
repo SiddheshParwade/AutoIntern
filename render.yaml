@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: internfind
+    env: python
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "gunicorn InternFind.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: InternFind.settings
+      - key: PYTHON_VERSION
+        value: 3.11
