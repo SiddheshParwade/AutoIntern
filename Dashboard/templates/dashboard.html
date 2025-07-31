@@ -1,210 +1,382 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard - AutoIntern</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Internship Dashboard</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f7fc;
-      padding: 40px;
-      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    .top-bar {
+    body.dark {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .navbar {
+      background-color: #007bff;
+      padding: 15px 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 800px;
-      margin: 0 auto 20px;
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
-    .logout-form {
+    .navbar h2 {
       margin: 0;
     }
 
-    .logout-form button {
-      padding: 8px 16px;
-      background: #ff4b5c;
+    .navbar a {
       color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
+      margin-left: 20px;
+      text-decoration: none;
+      font-weight: 500;
     }
 
-    .logout-form button:hover {
-      background: #e60027;
+    .navbar a:hover {
+      text-decoration: underline;
+    }
+
+    .toggle-mode {
+      background: #ffffff;
+      color: #007bff;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    body.dark .toggle-mode {
+      background: #333;
+      color: #ffffff;
+    }
+
+    section {
+      padding: 30px;
+      max-width: 100%;
+      margin: auto;
     }
 
     h1 {
       text-align: center;
-      color: #4a63e7;
+      color: #333;
+      margin-top: 20px;
+    }
+
+    body.dark h1,
+    body.dark h2,
+    body.dark h3 {
+      color: #ffffff;
     }
 
     form {
-      max-width: 800px;
-      margin: 30px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    label {
-      font-weight: 600;
-      display: block;
-      margin: 10px 0 5px;
+    body.dark form {
+      background: #1e1e1e;
     }
 
-    textarea,
-    input {
+    form textarea,
+    form input[type="text"],
+    form input[type="number"] {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      resize: vertical;
+      background-color: #fff;
+      color: #000;
+    }
+
+    body.dark form textarea,
+    body.dark form input[type="text"],
+    body.dark form input[type="number"] {
+      background-color: #2a2a2a;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    form button:hover {
+      background-color: #0056b3;
+    }
+
+    #status-bar {
+      padding: 15px;
+      background-color: #e9f7ef;
+      border: 1px solid #d4edda;
+      margin-bottom: 25px;
+      border-radius: 5px;
+      color: #155724;
+      font-weight: bold;
+    }
+
+    body.dark #status-bar {
+      background-color: #2e7d32;
+      color: #ffffff;
+      border-color: #1b5e20;
+    }
+
+    #progress {
+      width: 100%;
+      background-color: #f3f3f3;
+      height: 10px;
+      border-radius: 5px;
       margin-bottom: 20px;
     }
 
-    button[type="submit"] {
-      padding: 12px 20px;
-      background: #4a63e7;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
+    body.dark #progress {
+      background-color: #444;
     }
 
-    button[type="submit"]:hover {
-      background: #3247cc;
+    #bar {
+      width: 0%;
+      height: 100%;
+      background-color: #28a745;
+      border-radius: 5px;
     }
 
-    .results {
-      max-width: 1200px;
-      /* Increased width */
-      margin: 30px auto;
-      background: #e8f0fe;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    table {
+    width: 100%;
+    border-collapse: separate; /* allow border-radius */
+    border-spacing: 0; /* maintain no gaps between cells */
+    background: #ffffff;
+    margin-top: 20px;
+    color: #000;
+    font-size: 12px;
+    table-layout: auto;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 10px; /* your desired radius */
+    overflow: hidden; /* clip rounded corners */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+    body.dark table {
+      background: #1e1e1e;
+      color: #ffffff;
     }
 
-    .result-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
-      /* Slightly larger font */
-    }
-
-    .result-table th,
-    .result-table td {
-      padding: 14px;
-      /* Increased cell padding */
-      border: 1px solid #ccc;
+    th,
+    td {
+      padding: 14px 16px;
+      border: 1px solid #ddd;
       text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    
     }
 
-    .about-section {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-      text-align: center;
+    body.dark th,
+    body.dark td {
+      border-color: #444;
     }
+
+    th {
+      background-color: #979494;
+    }
+    td {
+      background-color: rgb(224, 214, 214);
+    }
+
+    body.dark th {
+      background-color: #333;
+      color: #ffffff;
+    }
+
+    td a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    body.dark td a {
+      color: #90caf9;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    #about {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+      margin-bottom: 50px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark #about {
+      background: #1e1e1e;
+    }
+    .wid1{
+      width: 0%;
+    }
+    .wid2{
+      width: 10%;
+    }
+    .wid3{
+      width: 8%;
+    }
+    .wid4{
+      width: 11%;
+    }
+    .wid5{
+      width: 6%;
+    }
+    .wid6{
+      width: 0%;
+    }
+    .wid7{
+      width: 6%;
+    }
+    .wid8{
+      width: 1%;
+    }
+    .wid9{
+      width: 20%;
+    }
+    .wid10{
+      width: 2%;
+    }
+    
   </style>
+
 </head>
 
 <body>
+  <div class="navbar">
+    <h2>Internship Finder</h2>
+    <div>
+      <a href="#home">Home</a>
+      <a href="#about">About Us</a>
+      <span class="toggle-mode" onclick="toggleMode()">🌙 Dark Mode</span>
+    </div>
+  </div>
 
-  <div class="top-bar">
-    <h1>Internship Search Dashboard</h1>
-    <form method="post" action="{% url 'logout' %}" class="logout-form">
+  <section id="home">
+    <h1>Internship Scraper Dashboard</h1>
+
+    <div id="status-bar">Waiting for scraping to start...</div>
+    <div id="progress">
+      <div id="bar"></div>
+    </div>
+
+    <form method="POST">
       {% csrf_token %}
-      <button type="submit">Logout</button>
+      <textarea name="urls" rows="4"
+        placeholder="Enter one or more URLs ( comma-separated )">{{ urls_input }}</textarea>
+      <input type="text" name="keywords" value="{{ keywords_input }}" placeholder="Enter keywords (comma-separated)" />
+      <input type="number" name="start_page" value="{{ start_page }}" placeholder="Start Page" />
+      <input type="number" name="end_page" value="{{ end_page }}" placeholder="End Page" />
+      <button type="submit">Find Internships</button>
     </form>
-  </div>
 
-  <form method="POST">
-    {% csrf_token %}
-    <label for="urls">Enter Internship URLs (use comma for separation):</label>
-    <textarea id="urls" name="urls" rows="5"
-      placeholder="https://internshala.com/internships/python-django-internship">{{ request.POST.urls }}</textarea>
-
-    <label for="keywords">Enter Skill Keywords to Search (comma-separated):</label>
-    <input type="text" id="keywords" name="keywords" placeholder="django, data science, remote"
-      value="{{ request.POST.keywords }}">
-
-    <label for="start_page">Start Page:</label>
-    <input type="number" id="start_page" name="start_page" value="{{ request.POST.start_page|default:1 }}">
-
-    <label for="end_page">End Page:</label>
-    <input type="number" id="end_page" name="end_page" value="{{ request.POST.end_page|default:3 }}">
-
-    <button type="submit">Search Internships</button>
-  </form>
-  <!-- Loading message (hidden by default) -->
-  <div id="loading" style="display:none; color: green; font-weight: bold; text-align:center; margin-top: 10px;">
-    🔄 Scraping internships... Please wait.
-  </div>
-
-  <script>
-    // Show loading message on form submit
-    document.querySelector("form").addEventListener("submit", function () {
-      document.getElementById("loading").style.display = "block";
-    });
-  </script>
-
-
-  {% if internships %}
-  <div class="results">
-    <h2>Matched Internships:</h2>
-    <table class="result-table">
+    {% if internships %}
+    <a href="/media/internships.csv" download>📥 Download CSV</a>
+    <table>
       <thead>
         <tr>
-          <th>#</th>
-          <th>Title</th>
-          <th>Location</th>
-          <th>Stipend</th>
-          <th>Posted</th>
-          <th>Start</th>
-          <th>Apply By</th>
-          <th>Duration</th>
-          <th>Skills</th>
-          <th>Link</th>
+          <th class="wid1">No.</th>
+          <th class="wid2">Name</th>
+          <th class="wid3">Location</th>
+          <th class="wid4">Salary</th>
+          <th class="wid5">Post Time</th>
+          <th class="wid6">Join Date</th>
+          <th class="wid7">Last Date</th>
+          <th class="wid8">Duration</th>
+          <th class="wid9">Skills</th>
+          <th class="wid10">Link</th>
         </tr>
       </thead>
       <tbody>
-        {% for i in internships %}
+        {% for internship in internships %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td>{{ i.1 }}</td>
-          <td>{{ i.2 }}</td>
-          <td>{{ i.3 }}</td>
-          <td>{{ i.4 }}</td>
-          <td>{{ i.5 }}</td>
-          <td>{{ i.6 }}</td>
-          <td>{{ i.7 }}</td>
-          <td>{{ i.8|join:", " }}</td>
-          <td><a href="{{ i.9 }}" target="_blank">View</a></td>
+          <td>{{ internship.1 }}</td>
+          <td>{{ internship.2 }}</td>
+          <td>{{ internship.3 }}</td>
+          <td>{{ internship.4 }}</td>
+          <td>{{ internship.5 }}</td>
+          <td>{{ internship.6 }}</td>
+          <td>{{ internship.7 }}</td>
+          <td>{{ internship.8|join:', ' }}</td>
+          <td><a href="{{ internship.9 }}" target="_blank">View</a></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-  </div>
-  {% endif %}
+    {% endif %}
+  </section>
 
-  <div class="about-section">
-    <h2>About AutoIntern</h2>
-    <p>AutoIntern is a smart internship finder that helps students find relevant internships across multiple platforms
-      by automating the search and filtering process using advanced scraping techniques. This tool is built with Django,
-      BeautifulSoup, and Python, aiming to streamline career opportunities for budding developers and professionals.</p>
-  </div>
+  <section id="about">
+    <h2>About Us</h2>
+    <p>
+      Welcome to Internship Finder! This tool helps students and developers find the most relevant internships
+      by scraping opportunities from trusted platforms like Internshala based on your preferred skills and criteria.
+    </p>
+    <p>
+      Developed using Python, Django, and modern scraping techniques, this project demonstrates the power of automation
+      in career discovery. It was created as a learning project and continues to improve with new features!
+    </p>
+  </section>
+
+  <script>
+    function toggleMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    function pollStatus() {
+      fetch("", {
+        headers: { "X-Requested-With": "XMLHttpRequest" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status && data.page !== undefined) {
+            document.getElementById("status-bar").innerText =
+              `🔍 Scraping ${data.status} (Page ${data.page})...`;
+
+            let percent = Math.min(100, ((data.page || 0) / 10) * 100);
+            document.getElementById("bar").style.width = percent + "%";
+          }
+          setTimeout(pollStatus, 1500);
+        })
+        .catch(err => {
+          console.error("Status fetch failed", err);
+          setTimeout(pollStatus, 3000);
+        });
+    }
+
+    pollStatus();
+  </script>
 </body>
 
 </html>
