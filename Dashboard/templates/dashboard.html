@@ -148,6 +148,18 @@
 
     <button type="submit">Search Internships</button>
   </form>
+  <!-- Loading message (hidden by default) -->
+  <div id="loading" style="display:none; color: green; font-weight: bold; text-align:center; margin-top: 10px;">
+    🔄 Scraping internships... Please wait.
+  </div>
+
+  <script>
+    // Show loading message on form submit
+    document.querySelector("form").addEventListener("submit", function () {
+      document.getElementById("loading").style.display = "block";
+    });
+  </script>
+
 
   {% if internships %}
   <div class="results">
