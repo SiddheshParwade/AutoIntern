@@ -259,7 +259,7 @@
       width: 6%;
     }
     .wid8{
-      width: 1%;
+      width: 3%;
     }
     .wid9{
       width: 20%;
@@ -350,8 +350,10 @@
   </section>
 
   <script>
+  let reloadCount = 0;
+  const maxReloads = 7;
+  let previousTableHTML = document.querySelector("#internship-table tbody")?.innerHTML || "";
   let hasReloaded = false;
-  let previousTableHTML = document.querySelector("#internship-table tbody").innerHTML;
 
   function pollStatus() {
     fetch("", {
@@ -367,23 +369,25 @@
         document.getElementById("bar").style.width = percent + "%";
       }
 
-      if (data.status === "Completed" && !hasReloaded) {
-        // Check if table data changed
+      if (data.status === "Completed" && reloadCount < maxReloads) {
         fetch(window.location.href)
           .then(res => res.text())
           .then(html => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
-            const newTableHTML = doc.querySelector("#internship-table tbody").innerHTML;
+            const newTableHTML = doc.querySelector("#internship-table tbody")?.innerHTML || "";
 
             if (newTableHTML !== previousTableHTML) {
-              hasReloaded = true;
+              previousTableHTML = newTableHTML;
+              reloadCount++;
+              console.log("Reloading: attempt", reloadCount);
               location.reload();
             } else {
-              // Table hasn't changed, poll again after a short wait
               setTimeout(pollStatus, 2000);
             }
           });
+      } else if (reloadCount >= maxReloads) {
+        console.log("Max reloads reached.");
       } else {
         setTimeout(pollStatus, 1500);
       }
