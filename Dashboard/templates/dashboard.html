@@ -166,19 +166,23 @@
     }
 
     table {
-    width: 100%;
-    border-collapse: separate; /* allow border-radius */
-    border-spacing: 0; /* maintain no gaps between cells */
-    background: #ffffff;
-    margin-top: 20px;
-    color: #000;
-    font-size: 12px;
-    table-layout: auto;
-    transition: background-color 0.3s, color 0.3s;
-    border-radius: 10px; /* your desired radius */
-    overflow: hidden; /* clip rounded corners */
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
-}
+      width: 100%;
+      border-collapse: separate;
+      /* allow border-radius */
+      border-spacing: 0;
+      /* maintain no gaps between cells */
+      background: #ffffff;
+      margin-top: 20px;
+      color: #000;
+      font-size: 12px;
+      table-layout: auto;
+      transition: background-color 0.3s, color 0.3s;
+      border-radius: 10px;
+      /* your desired radius */
+      overflow: hidden;
+      /* clip rounded corners */
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    }
 
     body.dark table {
       background: #1e1e1e;
@@ -192,7 +196,7 @@
       text-align: left;
       font-size: 14px;
       vertical-align: top;
-    
+
     }
 
     body.dark th,
@@ -203,6 +207,7 @@
     th {
       background-color: #979494;
     }
+
     td {
       background-color: rgb(224, 214, 214);
     }
@@ -237,37 +242,46 @@
     body.dark #about {
       background: #1e1e1e;
     }
-    .wid1{
+
+    .wid1 {
       width: 0%;
     }
-    .wid2{
+
+    .wid2 {
       width: 10%;
     }
-    .wid3{
+
+    .wid3 {
       width: 8%;
     }
-    .wid4{
+
+    .wid4 {
       width: 11%;
     }
-    .wid5{
+
+    .wid5 {
       width: 6%;
     }
-    .wid6{
+
+    .wid6 {
       width: 0%;
     }
-    .wid7{
+
+    .wid7 {
       width: 6%;
     }
-    .wid8{
+
+    .wid8 {
       width: 1%;
     }
-    .wid9{
+
+    .wid9 {
       width: 20%;
     }
-    .wid10{
+
+    .wid10 {
       width: 2%;
     }
-    
   </style>
 
 </head>
@@ -302,38 +316,40 @@
 
     {% if internships %}
     <a href="/media/internships.csv" download>📥 Download CSV</a>
-    <table>
-      <thead>
-        <tr>
-          <th class="wid1">No.</th>
-          <th class="wid2">Name</th>
-          <th class="wid3">Location</th>
-          <th class="wid4">Salary</th>
-          <th class="wid5">Post Time</th>
-          <th class="wid6">Join Date</th>
-          <th class="wid7">Last Date</th>
-          <th class="wid8">Duration</th>
-          <th class="wid9">Skills</th>
-          <th class="wid10">Link</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for internship in latest_internships %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ internship.1 }}</td>
-          <td>{{ internship.2 }}</td>
-          <td>{{ internship.3 }}</td>
-          <td>{{ internship.4 }}</td>
-          <td>{{ internship.5 }}</td>
-          <td>{{ internship.6 }}</td>
-          <td>{{ internship.7 }}</td>
-          <td>{{ internship.8|join:', ' }}</td>
-          <td><a href="{{ internship.9 }}" target="_blank">View</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div id="internship-table">
+      <table>
+        <thead>
+          <tr>
+            <th class="wid1">No.</th>
+            <th class="wid2">Name</th>
+            <th class="wid3">Location</th>
+            <th class="wid4">Salary</th>
+            <th class="wid5">Post Time</th>
+            <th class="wid6">Join Date</th>
+            <th class="wid7">Last Date</th>
+            <th class="wid8">Duration</th>
+            <th class="wid9">Skills</th>
+            <th class="wid10">Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for internship in internships %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ internship.1 }}</td>
+            <td>{{ internship.2 }}</td>
+            <td>{{ internship.3 }}</td>
+            <td>{{ internship.4 }}</td>
+            <td>{{ internship.5 }}</td>
+            <td>{{ internship.6 }}</td>
+            <td>{{ internship.7 }}</td>
+            <td>{{ internship.8|join:', ' }}</td>
+            <td><a href="{{ internship.9 }}" target="_blank">View</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     {% endif %}
   </section>
 
@@ -354,6 +370,8 @@
       document.body.classList.toggle("dark");
     }
 
+    let previousStatus = "";
+
     function pollStatus() {
       fetch("", {
         headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -367,6 +385,15 @@
             let percent = Math.min(100, ((data.page || 0) / 10) * 100);
             document.getElementById("bar").style.width = percent + "%";
           }
+
+          // ✅ if scraping just completed, reload the table
+          if (data.status === "Completed" && previousStatus !== "Completed") {
+            previousStatus = "Completed";
+            refreshInternshipTable();
+          } else {
+            previousStatus = data.status;
+          }
+
           setTimeout(pollStatus, 1500);
         })
         .catch(err => {
@@ -375,8 +402,23 @@
         });
     }
 
+    function refreshInternshipTable() {
+      fetch(window.location.href)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const newTable = doc.querySelector("#internship-table");
+          const oldTable = document.querySelector("#internship-table");
+          if (newTable && oldTable) {
+            oldTable.innerHTML = newTable.innerHTML;
+          }
+        });
+    }
+
     pollStatus();
   </script>
+
 </body>
 
 </html>
