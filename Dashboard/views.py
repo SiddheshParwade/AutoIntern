@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .scraper import scrape_internships
+import threading
 
 scraping_status = {"status": "", "page": 0}
 latest_internships = []  # store data temporarily
@@ -30,11 +31,15 @@ def dashboard(request):
                 scraping_status["status"] = current_url
                 scraping_status["page"] = current_page
 
-            _, latest_internships = scrape_internships(
-                urls, keywords, int(start_page), int(end_page)+1, update_callback=update_status
-            )
+            def run_scraper():
+                global latest_internships
+                _, latest_internships = scrape_internships(
+                    urls, keywords, int(start_page), int(end_page)+1, update_callback=update_status
+                )
+                scraping_status["status"] = "Completed"
+                scraping_status["page"] = 0
 
-            scraping_status = {"status": "Completed", "page": 0}
+            threading.Thread(target=run_scraper).start()
             return redirect("dashboard")  # PRG: redirect after POST
 
     return render(request, "dashboard.html", {
